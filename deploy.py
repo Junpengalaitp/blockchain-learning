@@ -1,4 +1,5 @@
 import json
+import solcx
 from solcx import compile_standard
 from web3 import Web3
 
@@ -32,8 +33,8 @@ if __name__ == "__main__":
     # print(abi)
     w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
     chain_id = 1337
-    my_address = "0xFCA99518cD183A9753494b8148fA5e82CFB600db"
-    private_key = "0x39e5393edff2ac8fda5528f23b073c6cb7a63f10a0d44ecfb659bf9d24aa9da8"
+    my_address = "0x3bcaDCB9068461aa6Cd941Cc8f4cCCF2f7CBc2b2"
+    private_key = "0xdc96642c44187bc3afa72c7ade6d9b7619ee1a3ce7c615bbfac15c239dd3fd3f"
 
     # eth = w3.eth
 
@@ -49,8 +50,8 @@ if __name__ == "__main__":
     )
     
     signed_txn = w3.eth.account.sign_transaction(transaction, private_key)
-    tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    tx_hash = w3.eth.sendRawTransaction(signed_txn.rawTransaction)
+    tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash)
     # print(signed_txn)
 
 
@@ -60,6 +61,6 @@ if __name__ == "__main__":
         {"chainId": chain_id, "from": my_address, "nonce": nonce + 1}
     )
     sign_store_txn = w3.eth.account.sign_transaction(store_transaction, private_key)
-    sign_store_txn_hash = w3.eth.send_raw_transaction(sign_store_txn.rawTransaction)
-    tx_receipt = w3.eth.wait_for_transaction_receipt(sign_store_txn_hash)
+    sign_store_txn_hash = w3.eth.sendRawTransaction(sign_store_txn.rawTransaction)
+    tx_receipt = w3.eth.waitForTransactionReceipt(sign_store_txn_hash)
     print(simple_storage.functions.retrieve().call())
