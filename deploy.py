@@ -32,17 +32,34 @@ if __name__ == "__main__":
     # print(abi)
     w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
     chain_id = 1337
-    my_address = "0xE25725Ab99FDBD69BCa7Af40C420b76ACcd9C78B"
-    private_key = "0x495d7eb2ba46b1dd9a3ee52a5ec8929d475433043f0dd34fb442f40fdac62b0a"
+    my_address = "0xFCA99518cD183A9753494b8148fA5e82CFB600db"
+    private_key = "0x39e5393edff2ac8fda5528f23b073c6cb7a63f10a0d44ecfb659bf9d24aa9da8"
+
+    # eth = w3.eth
 
     simple_storage = w3.eth.contract(abi=abi, bytecode=bytecode)
     nonce = w3.eth.getTransactionCount(my_address)
     # print(nonce)
 
+    # 1. Build an transaction
+    # 2. Sign an transaction
+    # 3. Send an transaction
     transaction = simple_storage.constructor().buildTransaction(
         {"chainId": chain_id, "from": my_address, "nonce": nonce}
     )
+    
+    signed_txn = w3.eth.account.sign_transaction(transaction, private_key)
+    tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    # print(signed_txn)
 
-    print(transaction)
 
-
+    simple_storage = w3.eth.contract(address=tx_receipt.contractAddress, abi=abi)
+    print(simple_storage.functions.retrieve().call())
+    store_transaction = simple_storage.functions.store(15).buildTransaction(
+        {"chainId": chain_id, "from": my_address, "nonce": nonce + 1}
+    )
+    sign_store_txn = w3.eth.account.sign_transaction(store_transaction, private_key)
+    sign_store_txn_hash = w3.eth.send_raw_transaction(sign_store_txn.rawTransaction)
+    tx_receipt = w3.eth.wait_for_transaction_receipt(sign_store_txn_hash)
+    print(simple_storage.functions.retrieve().call())
